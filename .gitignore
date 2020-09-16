@@ -1,0 +1,14 @@
+*.wav
+result/*
+text_input/*
+logdir/*
+
+.idea/.gitignore
+.idea/dctts_docker.iml
+.idea/deployment.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/sonarIssues.xml
+.idea/sonarlint/
+.idea/vcs.xml
