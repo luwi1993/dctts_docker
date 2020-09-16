@@ -1,6 +1,9 @@
 # dctts_docker
 docker setup to start dctts implementation by Kyubyong https://github.com/Kyubyong/dc_tts
 
+step 0:
+    build docker image from Dockerfile with tag dctts
+
 step 1: 
     fix source path in docker_run.sh
 

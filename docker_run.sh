@@ -1,1 +1,1 @@
-sudo docker run -it -v "/home/lwidowski/Documents/sound/logdir/:/dctts/logdir/:rw" -v "/home/lwidowski/Documents/sound/results/:/dctts/samples/:rw" -v "/home/lwidowski/Documents/sound/text_input:/dctts/text_input:rw" dctts 
+sudo docker run -it -v "/home/lwidowski/Documents/sound/dctts_docker/logdir/:/dctts/logdir/:rw" -v "/home/lwidowski/Documents/sound/dctts_docker/results/:/dctts/samples/:rw" -v "/home/lwidowski/Documents/sound/dctts_docker/text_input:/dctts/text_input:rw" dctts
