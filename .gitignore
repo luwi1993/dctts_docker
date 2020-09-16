@@ -1,7 +1,7 @@
 *.wav
-result/*
-text_input/*
-logdir/*
+
+logdir/LJ01-1/*
+logdir/LJ01-2/*
 
 .idea/.gitignore
 .idea/dctts_docker.iml
