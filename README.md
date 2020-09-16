@@ -1,11 +1,11 @@
 # dctts_docker
-docker setup to start dctts implementation by Kyubyong https://github.com/Kyubyong/dc_tts/blob/master/networks.py
+docker setup to start dctts implementation by Kyubyong https://github.com/Kyubyong/dc_tts
 
 step 1: 
     fix source path in docker_run.sh
 
 step 2:
-    download pretrained model https://github.com/Kyubyong/dc_tts/blob/master/networks.py
+    download pretrained model https://github.com/Kyubyong/dc_tts
     
 step 3:
     create your own sentences in text_input directory 
