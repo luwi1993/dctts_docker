@@ -15,9 +15,6 @@ step 3:
     
 step 4: 
     run docker_run.sh (install docker)
-   
-step 5:
-    run /dctts/sentences.py 
     
 step 5: 
     see results in the directory you linked to /dctts/samples/ in step 1
