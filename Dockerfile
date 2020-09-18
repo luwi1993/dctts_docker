@@ -21,6 +21,7 @@ run pip install scipy
 run mkdir /dctts
 run git clone https://github.com/Kyubyong/dc_tts.git /dctts
 copy cfg/hyperparams.py /dctts/hyperparams.py
+copy cfg/data_load.py /dctts/data_load.py
 #copy dctts/ /dctts/
 run mkdir /dctts/text_input
 run mv /dctts/harvard_sentences.txt /dctts/text_input/harvard_sentences.txt
