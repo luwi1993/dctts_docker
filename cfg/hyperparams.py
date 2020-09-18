@@ -45,4 +45,4 @@ class Hyperparams:
     transfer_logdir = "/dctts/logdir/LJ01"
     sampledir = '/dctts/samples'
     B = 32 # batch size
-    num_iterations = 2000000
+    num_iterations = 15000

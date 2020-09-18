@@ -148,7 +148,8 @@ if __name__ == '__main__':
         # Restore parameters
         var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'Text2Mel')
         saver1 = tf.train.Saver(var_list=var_list)
-        saver1.restore(sess, tf.train.latest_checkpoint(hp.transfer_logdir + "-1"))
+        text_to_mel_model_path = hp.transfer_logdir if num == 1 else hp.logdir
+        saver1.restore(sess, tf.train.latest_checkpoint(text_to_mel_model_path + "-1"))
         print("Text2Mel Restored!")
 
         var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'SSRN') + \
@@ -160,7 +161,7 @@ if __name__ == '__main__':
         while 1:
             for _ in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
                 gs, _ = sess.run([g.global_step, g.train_op])
-
+                print("global_step", gs)
                 # Write checkpoint files at every 1k steps
                 if gs % 1000 == 0:
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
