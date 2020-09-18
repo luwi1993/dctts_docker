@@ -167,11 +167,11 @@ if __name__ == '__main__':
         while 1:
             for _ in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
                 gs, _ = sess.run([g.global_step, g.train_op])
+
                 if start_gs == None:
                     start_gs = gs
                     max_iter = start_gs + hp.num_iterations
 
-                print("global_step", gs, gs / max_iter)
                 # Write checkpoint files at every 1k steps
                 if gs - start_gs % 1000 == 0:
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
