@@ -170,10 +170,11 @@ if __name__ == '__main__':
 
                 if start_gs == None:
                     start_gs = gs
-                    max_iter = start_gs + hp.num_iterations
+                local_step = gs - start_gs
 
                 # Write checkpoint files at every 1k steps
-                if gs - start_gs % 1000 == 0:
+                if local_step % 1000 == 0:
+                    print("model_saved",gs,gs-start_gs/)
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
 
                     if num == 1:
@@ -182,6 +183,6 @@ if __name__ == '__main__':
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
 
                 # break
-            if gs > max_iter: break
+            if local_step > hp.num_iterations: break
 
     print("Done")
