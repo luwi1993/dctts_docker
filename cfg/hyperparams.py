@@ -42,6 +42,7 @@ class Hyperparams:
     # training scheme
     lr = 0.001 # Initial learning rate.
     logdir = "/dctts/logdir/LW"
+    transfer_logdir = "/dctts/logdir/LJ01"
     sampledir = '/dctts/samples'
     B = 32 # batch size
     num_iterations = 2000000
