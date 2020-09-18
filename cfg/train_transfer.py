@@ -144,8 +144,9 @@ if __name__ == '__main__':
     g = Graph(num=num);
     print("Training Graph loaded")
 
-    var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'Text2Mel')
-    saver1 = tf.train.Saver(var_list=var_list)
+    if num == 1:
+        var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'Text2Mel')
+        saver1 = tf.train.Saver(var_list=var_list)
     var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'SSRN') + \
                tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, 'gs')
     saver2 = tf.train.Saver(var_list=var_list)
@@ -155,9 +156,10 @@ if __name__ == '__main__':
     with sv.managed_session() as sess:
 
         # Restore parameters
-        text_to_mel_model_path = hp.transfer_logdir if num == 1 else hp.logdir
-        saver1.restore(sess, tf.train.latest_checkpoint(text_to_mel_model_path + "-1"))
-        print("Text2Mel Restored!" + text_to_mel_model_path)
+        if num == 1:
+            text_to_mel_model_path = hp.transfer_logdir if num == 1 else hp.logdir
+            saver1.restore(sess, tf.train.latest_checkpoint(text_to_mel_model_path + "-1"))
+            print("Text2Mel Restored!" + text_to_mel_model_path)
 
         saver2.restore(sess, tf.train.latest_checkpoint(hp.transfer_logdir + "-2"))
         print("SSRN Restored!" + hp.transfer_logdir)
