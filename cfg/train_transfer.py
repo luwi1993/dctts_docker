@@ -29,14 +29,14 @@ class Graph:
         self.char2idx, self.idx2char = load_vocab()
 
         # Set flag
-        training = True if mode=="train" else False
+        training = True if mode == "train" else False
 
         # Graph
         # Data Feeding
         ## L: Text. (B, N), int32
         ## mels: Reduced melspectrogram. (B, T/r, n_mels) float32
         ## mags: Magnitude. (B, T, n_fft//2+1) float32
-        if mode=="train":
+        if mode == "train":
             self.L, self.mels, self.mags, self.fnames, self.num_batch = get_batch()
             self.prev_max_attentions = tf.ones(shape=(hp.B,), dtype=tf.int32)
             self.gts = tf.convert_to_tensor(guided_attention())
@@ -45,7 +45,7 @@ class Graph:
             self.mels = tf.placeholder(tf.float32, shape=(None, None, hp.n_mels))
             self.prev_max_attentions = tf.placeholder(tf.int32, shape=(None,))
 
-        if num==1 or (not training):
+        if num == 1 or (not training):
             with tf.variable_scope("Text2Mel"):
                 # Get S or decoder inputs. (B, T//r, n_mels)
                 self.S = tf.concat((tf.zeros_like(self.mels[:, :1, :]), self.mels[:, :-1, :]), 1)
@@ -65,7 +65,7 @@ class Graph:
                                                                              mononotic_attention=(not training),
                                                                              prev_max_attentions=self.prev_max_attentions)
                 with tf.variable_scope("AudioDec"):
-                    self.Y_logits, self.Y = AudioDec(self.R, training=training) # (B, T/r, n_mels)
+                    self.Y_logits, self.Y = AudioDec(self.R, training=training)  # (B, T/r, n_mels)
         else:  # num==2 & training. Note that during training,
             # the ground truth melspectrogram values are fed.
             with tf.variable_scope("SSRN"):
@@ -80,15 +80,17 @@ class Graph:
             self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         if training:
-            if num==1: # Text2Mel
+            if num == 1:  # Text2Mel
                 # mel L1 loss
                 self.loss_mels = tf.reduce_mean(tf.abs(self.Y - self.mels))
 
                 # mel binary divergence loss
-                self.loss_bd1 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.Y_logits, labels=self.mels))
+                self.loss_bd1 = tf.reduce_mean(
+                    tf.nn.sigmoid_cross_entropy_with_logits(logits=self.Y_logits, labels=self.mels))
 
                 # guided_attention loss
-                self.A = tf.pad(self.alignments, [(0, 0), (0, hp.max_N), (0, hp.max_T)], mode="CONSTANT", constant_values=-1.)[:, :hp.max_N, :hp.max_T]
+                self.A = tf.pad(self.alignments, [(0, 0), (0, hp.max_N), (0, hp.max_T)], mode="CONSTANT",
+                                constant_values=-1.)[:, :hp.max_N, :hp.max_T]
                 self.attention_masks = tf.to_float(tf.not_equal(self.A, -1))
                 self.loss_att = tf.reduce_sum(tf.abs(self.A * self.gts) * self.attention_masks)
                 self.mask_sum = tf.reduce_sum(self.attention_masks)
@@ -102,12 +104,13 @@ class Graph:
                 tf.summary.scalar('train/loss_att', self.loss_att)
                 tf.summary.image('train/mel_gt', tf.expand_dims(tf.transpose(self.mels[:1], [0, 2, 1]), -1))
                 tf.summary.image('train/mel_hat', tf.expand_dims(tf.transpose(self.Y[:1], [0, 2, 1]), -1))
-            else: # SSRN
+            else:  # SSRN
                 # mag L1 loss
                 self.loss_mags = tf.reduce_mean(tf.abs(self.Z - self.mags))
 
                 # mag binary divergence loss
-                self.loss_bd2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.Z_logits, labels=self.mags))
+                self.loss_bd2 = tf.reduce_mean(
+                    tf.nn.sigmoid_cross_entropy_with_logits(logits=self.Z_logits, labels=self.mags))
 
                 # total loss
                 self.loss = self.loss_mags + self.loss_bd2
@@ -138,7 +141,8 @@ if __name__ == '__main__':
     # argument: 1 or 2. 1 for Text2mel, 2 for SSRN.
     num = int(sys.argv[1])
 
-    g = Graph(num=num); print("Training Graph loaded")
+    g = Graph(num=num);
+    print("Training Graph loaded")
 
     var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'Text2Mel')
     saver1 = tf.train.Saver(var_list=var_list)
@@ -153,22 +157,26 @@ if __name__ == '__main__':
         # Restore parameters
         text_to_mel_model_path = hp.transfer_logdir if num == 1 else hp.logdir
         saver1.restore(sess, tf.train.latest_checkpoint(text_to_mel_model_path + "-1"))
-        print("Text2Mel Restored!"+text_to_mel_model_path)
+        print("Text2Mel Restored!" + text_to_mel_model_path)
 
         saver2.restore(sess, tf.train.latest_checkpoint(hp.transfer_logdir + "-2"))
-        print("SSRN Restored!"+hp.transfer_logdir)
+        print("SSRN Restored!" + hp.transfer_logdir)
 
-        start_gs = tf.cast(g.global_step,int)
-        max_iter = start_gs + hp.num_iterations
+        start_gs = None
+
         while 1:
             for _ in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
                 gs, _ = sess.run([g.global_step, g.train_op])
-                print("global_step", gs, gs/max_iter)
+                if start_gs == None:
+                    start_gs = gs
+                    max_iter = start_gs + hp.num_iterations
+
+                print("global_step", gs, gs / max_iter)
                 # Write checkpoint files at every 1k steps
-                if gs-start_gs % 1000 == 0:
+                if gs - start_gs % 1000 == 0:
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
 
-                    if num==1:
+                    if num == 1:
                         # plot alignment
                         alignments = sess.run(g.alignments)
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
