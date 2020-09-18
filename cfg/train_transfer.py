@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
                 # Write checkpoint files at every 1k steps
                 if local_step % 1000 == 0:
-                    print("model_saved",gs,gs-start_gs/)
+                    print("model_saved",gs,gs-start_gs/hp.num_iterations)
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
 
                     if num == 1:
