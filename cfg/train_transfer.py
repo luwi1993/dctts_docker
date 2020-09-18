@@ -149,7 +149,6 @@ if __name__ == '__main__':
     logdir = hp.logdir + "-" + str(num)
     sv = tf.train.Supervisor(logdir=logdir, save_model_secs=0, global_step=g.global_step)
     with sv.managed_session() as sess:
-        sess.run(tf.global_variables_initializer())
 
         # Restore parameters
         text_to_mel_model_path = hp.transfer_logdir if num == 1 else hp.logdir
@@ -159,12 +158,14 @@ if __name__ == '__main__':
         saver2.restore(sess, tf.train.latest_checkpoint(hp.transfer_logdir + "-2"))
         print("SSRN Restored!"+hp.transfer_logdir)
 
+        start_gs = tf.cast(g.global_step,int)
+        max_iter = start_gs + hp.num_iterations
         while 1:
             for _ in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
                 gs, _ = sess.run([g.global_step, g.train_op])
-                print("global_step", gs)
+                print("global_step", gs, gs/max_iter)
                 # Write checkpoint files at every 1k steps
-                if gs % 1000 == 0:
+                if gs-start_gs % 1000 == 0:
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
 
                     if num==1:
@@ -173,6 +174,6 @@ if __name__ == '__main__':
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
 
                 # break
-                if gs > hp.num_iterations: break
+            if gs > max_iter: break
 
     print("Done")
