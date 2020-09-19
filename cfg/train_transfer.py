@@ -174,9 +174,8 @@ if __name__ == '__main__':
                     start_gs = gs
                 local_step = gs - start_gs
 
-
                 # Write checkpoint files at every 1k steps
-                if local_step % 1000 == 0:
+                if (local_step % 1000 == 0 and num == 1) or (local_step % 10 == 0 and num == 2):
                     print("model_saved")
                     sv.saver.save(sess, logdir + '/model_gs_{}'.format(str(gs // 1000).zfill(3) + "k"))
 
@@ -184,7 +183,6 @@ if __name__ == '__main__':
                         # plot alignment
                         alignments = sess.run(g.alignments)
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
-
                 # break
 
             print("global_step=", gs, "\tlocal_step", local_step, "\tlocal_progress",
