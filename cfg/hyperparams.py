@@ -32,7 +32,7 @@ class Hyperparams:
     attention_win_size = 3
 
     # data
-    data = "/dctts/data/private/voice/LJSpeech-1.0"
+    data = "/dctts/data/LWSpeech"
     # data = "/data/private/voice/kate"
     test_data = '/dctts/text_input/sentences.txt'
     vocab = "PE abcdefghijklmnopqrstuvwxyz'.?" # P: Padding, E: EOS.
@@ -41,7 +41,8 @@ class Hyperparams:
 
     # training scheme
     lr = 0.001 # Initial learning rate.
-    logdir = "/dctts/logdir/LJ01"
+    logdir = "/dctts/logdir/LW"
+    transfer_logdir = "/dctts/logdir/LJ01"
     sampledir = '/dctts/samples'
-    B = 32 # batch size
-    num_iterations = 2000000
+    B = 4 # batch size
+    num_iterations = 15000
