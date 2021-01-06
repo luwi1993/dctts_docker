@@ -16,6 +16,7 @@ from networks import TextEnc, AudioEnc, AudioDec, Attention, SSRN
 import tensorflow as tf
 from utils import *
 import sys
+from cfg.evaluation import evaluate
 
 
 class Graph:
@@ -183,6 +184,10 @@ if __name__ == '__main__':
                         # plot alignment
                         alignments = sess.run(g.alignments)
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
+
+
+                if local_step % hp.eval_freq == 0:
+                    evaluate()
                 # break
 
             print("global_step=", gs, "\tlocal_step", local_step, "\tlocal_progress",

@@ -22,6 +22,7 @@ run git clone https://github.com/Kyubyong/dc_tts.git /dctts
 copy cfg/hyperparams.py /dctts/hyperparams.py
 copy cfg/data_load.py /dctts/data_load.py
 copy cfg/train_transfer.py /dctts/train_transfer.py
+copy cfg/synthesis.py /dctts/synthesis.py
 copy cfg/run.sh /dctts/run.sh
 
 #copy dctts/ /dctts/
