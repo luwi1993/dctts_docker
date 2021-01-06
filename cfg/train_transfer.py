@@ -156,13 +156,13 @@ if __name__ == '__main__':
     with sv.managed_session() as sess:
 
         # Restore parameters
-        if num == 1:
-            text_to_mel_model_path = hp.transfer_logdir if num == 1 else hp.logdir
-            saver1.restore(sess, tf.train.latest_checkpoint(text_to_mel_model_path + "-1"))
-            print("Text2Mel Restored!" + text_to_mel_model_path)
+        if hp.restore:
+            if num == 1:
+                saver1.restore(sess, tf.train.latest_checkpoint(logdir + "-1"))
+                print("Text2Mel Restored!" + logdir)
 
-        saver2.restore(sess, tf.train.latest_checkpoint(hp.transfer_logdir + "-2"))
-        print("SSRN Restored!" + hp.transfer_logdir)
+            saver2.restore(sess, tf.train.latest_checkpoint(logdir + "-2"))
+            print("SSRN Restored!" + logdir)
 
         start_gs = None
 
