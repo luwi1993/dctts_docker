@@ -16,7 +16,7 @@ from networks import TextEnc, AudioEnc, AudioDec, Attention, SSRN
 import tensorflow as tf
 from utils import *
 import sys
-from cfg.evaluation import evaluate
+from cfg.evaluation import Evaluator
 
 
 class Graph:
@@ -154,6 +154,8 @@ if __name__ == '__main__':
 
     logdir = hp.logdir + "-" + str(num)
     sv = tf.train.Supervisor(logdir=logdir, save_model_secs=0, global_step=g.global_step)
+
+    evaluator = Evaluator()
     with sv.managed_session() as sess:
 
         # Restore parameters
@@ -187,7 +189,7 @@ if __name__ == '__main__':
 
 
                 if local_step % hp.eval_freq == 0:
-                    evaluate()
+                    evaluator.evaluate()
                 # break
 
             print("global_step=", gs, "\tlocal_step", local_step, "\tlocal_progress",
