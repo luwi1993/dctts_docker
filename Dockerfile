@@ -1,5 +1,5 @@
 #from nutzio/librosa-env
-from tensorflow/tensorflow
+from tensorflow/tensorflow:1.14.0-gpu-py3
 
 run apt-get update && \
     apt-get upgrade -y && \
@@ -8,7 +8,6 @@ run apt-get update && \
 run apt-get install libsndfile1 --yes
 run apt-get install vim --yes
 
-run pip install tensorflow==1.4
 run pip install --upgrade pip
 run pip install update pip
 run pip install numpy
@@ -23,9 +22,10 @@ run git clone https://github.com/Kyubyong/dc_tts.git /dctts
 copy cfg/hyperparams.py /dctts/hyperparams.py
 copy cfg/data_load.py /dctts/data_load.py
 copy cfg/train_transfer.py /dctts/train_transfer.py
+copy cfg/run.sh /dctts/run.sh
 
 #copy dctts/ /dctts/
 run mkdir /dctts/text_input
 run mv /dctts/harvard_sentences.txt /dctts/text_input/harvard_sentences.txt
-run mkdir /dctts/logdir/
-run mkdir /dctts/samples/
+run mkdir /dctts/logdir
+run mkdir /dctts/samples
