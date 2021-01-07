@@ -44,11 +44,25 @@ class Evaluator:
         pass
 
     # Evaluation
-    def evaluate_inside_domain(self):
-        pass
+    def evaluate_inside_domain(self, epoch):
+        info = synthesize("inside")
 
-    def evaluate_outside_domain(self):
-        pass
+    def evaluate_outside_domain(self, epoch):
+        info = synthesize("outside")
+        for file_name in info["samples"].keys():
+            utterance = info["samples"][file_name]
+            self.log["file_name"] = file_name
+            self.log["n_samples"] = len(utterance)
+            self.log["duration"] = self.log["n_samples"] / hp.sr
+            # self.log["roboticness"] = self.roboticness()  #TODO implement these functions!!!
+            # self.log["gpu_util"] = self.gpu_util()
+            # self.log["max_memory_required"] = self.max_memory_required()
+            # self.log["repetitions"] = self.repetitions()
+            # self.log["skipping"] = self.skipping()
+            self.log["epoch"] = epoch
+            for key in info["time_measurements"].keys():
+                self.log[key].append(info["time_measurements"][key])
+            self.log["relative_synthesis_time"] = self.log["duration"][-1] / self.log["duration_total"][-1]
 
     def evaluate(self, epoch):
         # Speed Measures calculated during synthesis

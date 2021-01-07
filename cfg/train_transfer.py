@@ -180,7 +180,7 @@ if __name__ == '__main__':
                     start_gs = gs
                 local_step = gs - start_gs
 
-                print("gs: {}, loss: {}".format(gs,loss))
+                print("local_step: {}, loss: {}".format(local_step,loss))
                 # Write checkpoint files at every 1k steps
                 if (local_step % 1000 == 0 and num == 1) or (local_step % 10 == 0 and num == 2):
                     print("model_saved")

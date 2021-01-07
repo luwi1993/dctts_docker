@@ -20,16 +20,18 @@ from tqdm import tqdm
 import time
 
 
-def synthesize():
+def synthesize(domain="outside"):
     info = {}
 
     absolute_beginning = time.time()
     info["start_time"] = absolute_beginning
     # Load data
-    L = load_data("synthesize")
-
+    if domain == "outside":
+        L = load_data("synthesize", domain=domain)
+    elif domain == "inside":
+        
     # Load graph
-    g = Graph(mode="synthesize");
+    synth_graph = Graph(mode="synthesize");
     print("Graph loaded")
 
     with tf.Session() as sess:
@@ -56,10 +58,10 @@ def synthesize():
         prev_max_attentions = np.zeros((len(L),), np.int32)
         for j in tqdm(range(hp.max_T)):
             _gs, _Y, _max_attentions, _alignments = \
-                sess.run([g.global_step, g.Y, g.max_attentions, g.alignments],
-                         {g.L: L,
-                          g.mels: Y,
-                          g.prev_max_attentions: prev_max_attentions})
+                sess.run([synth_graph.global_step, synth_graph.Y, synth_graph.max_attentions, synth_graph.alignments],
+                         {synth_graph.L: L,
+                          synth_graph.mels: Y,
+                          synth_graph.prev_max_attentions: prev_max_attentions})
             Y[:, j, :] = _Y[:, j, :]
             prev_max_attentions = _max_attentions[:, j]
 
@@ -74,7 +76,7 @@ def synthesize():
             mels["/{}.wav".format(i + 1)] = mel
 
         # Get magnitude
-        Z = sess.run(g.Z, {g.Y: Y})
+        Z = sess.run(synth_graph.Z, {synth_graph.Y: Y})
         duration_mags = time.time() - begin_of_frame_synthesis
         # Generate wav files
         if not os.path.exists(hp.sampledir): os.makedirs(hp.sampledir)

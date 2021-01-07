@@ -30,7 +30,7 @@ def text_normalize(text):
     text = re.sub("[ ]+", " ", text)
     return text
 
-def load_data(mode="train"):
+def load_data(mode="train", domain="outside"):
     '''Loads data
       Args:
           mode: "train" or "synthesize".
@@ -77,13 +77,34 @@ def load_data(mode="train"):
         return fpaths, text_lengths, texts
 
     else: # synthesize on unseen test text.
-        # Parse
-        lines = codecs.open(hp.test_data, 'r', 'utf-8').readlines()[1:]
-        sents = [text_normalize(line.split(" ", 1)[-1]).strip() + "E" for line in lines] # text normalization, E: EOS
-        texts = np.zeros((len(sents), hp.max_N), np.int32)
-        for i, sent in enumerate(sents):
-            texts[i, :len(sent)] = [char2idx[char] for char in sent]
-        return texts
+        if domain == "outside":
+            # Parse
+            lines = codecs.open(hp.test_data, 'r', 'utf-8').readlines()[1:]
+            sents = [text_normalize(line.split(" ", 1)[-1]).strip() + "E" for line in lines] # text normalization, E: EOS
+            texts = np.zeros((len(sents), hp.max_N), np.int32)
+            for i, sent in enumerate(sents):
+                texts[i, :len(sent)] = [char2idx[char] for char in sent]
+            return texts
+
+        elif domain == "inside":
+            fpaths, text_lengths, texts = [], [], []
+            transcript = os.path.join(hp.data, 'transcript.csv')
+            lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+            for i, line in enumerate(lines):
+                if i >= hp.n_in_domain_test_sentences:
+                    break
+                fname, _, text = line.strip().split("|")
+
+                fpath = os.path.join(hp.data, "wavs", fname + ".wav")
+                fpaths.append(fpath)
+
+                text = text_normalize(text) + "E"  # E: EOS
+                text = [char2idx[char] for char in text]
+                text_lengths.append(len(text))
+                texts.append(np.array(text, np.int32).tostring())
+
+            return fpaths, text_lengths, texts
+
 
 def get_batch():
     """Loads training data and put them in queues"""
