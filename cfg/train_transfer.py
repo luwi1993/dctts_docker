@@ -16,7 +16,7 @@ from networks import TextEnc, AudioEnc, AudioDec, Attention, SSRN
 import tensorflow as tf
 from utils import *
 import sys
-from cfg.evaluation import Evaluator
+from evaluation import Evaluator
 
 
 class Graph:
@@ -172,14 +172,15 @@ if __name__ == '__main__':
         while 1:
             for _ in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
                 if num == 1:
-                    gs, _, loss, target, pred = sess.run([g.global_step, g.train_op, g.loss, g.mels, g.Y])
+                    gs, _, loss = sess.run([g.global_step, g.train_op, g.loss])
                 else:
-                    gs, _, loss, target, pred = sess.run([g.global_step, g.train_op, g.loss, g.mags, g.Z])
+                    gs, _, loss = sess.run([g.global_step, g.train_op, g.loss])
 
                 if start_gs == None:
                     start_gs = gs
                 local_step = gs - start_gs
 
+                print("gs: {}, loss: {}".format(gs,loss))
                 # Write checkpoint files at every 1k steps
                 if (local_step % 1000 == 0 and num == 1) or (local_step % 10 == 0 and num == 2):
                     print("model_saved")
@@ -190,8 +191,6 @@ if __name__ == '__main__':
                         alignments = sess.run(g.alignments)
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
 
-                if local_step % hp.log_freq == 0:
-                    evaluator.calculate_metrics(loss, target, pred)
                 if local_step % hp.synth_freq == 0:
                     evaluator.evaluate(local_step)
                 # break

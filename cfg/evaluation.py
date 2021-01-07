@@ -44,6 +44,12 @@ class Evaluator:
         pass
 
     # Evaluation
+    def evaluate_inside_domain(self):
+        pass
+
+    def evaluate_outside_domain(self):
+        pass
+
     def evaluate(self, epoch):
         # Speed Measures calculated during synthesis
         info = synthesize()

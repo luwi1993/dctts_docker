@@ -21,7 +21,10 @@ import time
 
 
 def synthesize():
+    info = {}
+
     absolute_beginning = time.time()
+    info["start_time"] = absolute_beginning
     # Load data
     L = load_data("synthesize")
 
@@ -65,15 +68,25 @@ def synthesize():
             Latency_synthesis = time.time() - begin_of_frame_synthesis
 
         duration_mels = time.time() - begin_of_frame_synthesis
+
+        mels = {}
+        for i, mel in enumerate(Y):
+            mels["/{}.wav".format(i + 1)] = mel
+
         # Get magnitude
         Z = sess.run(g.Z, {g.Y: Y})
         duration_mags = time.time() - begin_of_frame_synthesis
         # Generate wav files
         if not os.path.exists(hp.sampledir): os.makedirs(hp.sampledir)
+
+        samples = {}
+        mags = {}
         for i, mag in enumerate(Z):
             print("Working on file", i + 1)
+            mags["/{}.wav".format(i + 1)] = mag
             wav = spectrogram2wav(mag)
             write(hp.sampledir + "/{}.wav".format(i + 1), hp.sr, wav)
+            samples["/{}.wav".format(i + 1)] = wav
 
         duration_total = begin_of_frame_synthesis
         time_measurents = {
@@ -84,7 +97,13 @@ def synthesize():
                             "duration_mags":duration_mags,
                             "duration_total":duration_total,
         }
-        return time_measurents
+
+        info["mels"] = mels
+        info["mags"] = mags
+        info["samples"] = samples
+        info["time_measurents"] = time_measurents
+
+        return info
 
 
 if __name__ == '__main__':
