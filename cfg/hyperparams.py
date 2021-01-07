@@ -45,6 +45,7 @@ class Hyperparams:
     transfer_logdir = "None"
     sampledir = '/dctts/samples'
     restore = False
-    eval_freq = 10
+    synth_freq = 10
+    log_freq = 10
     B = 4 # batch size
     num_iterations = 15000

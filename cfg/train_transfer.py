@@ -171,7 +171,10 @@ if __name__ == '__main__':
 
         while 1:
             for _ in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
-                gs, _ = sess.run([g.global_step, g.train_op])
+                if num == 1:
+                    gs, _, loss, target, pred = sess.run([g.global_step, g.train_op, g.loss, g.mels, g.Y])
+                else:
+                    gs, _, loss, target, pred = sess.run([g.global_step, g.train_op, g.loss, g.mags, g.Z])
 
                 if start_gs == None:
                     start_gs = gs
@@ -187,9 +190,10 @@ if __name__ == '__main__':
                         alignments = sess.run(g.alignments)
                         plot_alignment(alignments[0], str(gs // 1000).zfill(3) + "k", logdir)
 
-
-                if local_step % hp.eval_freq == 0:
-                    evaluator.evaluate()
+                if local_step % hp.log_freq == 0:
+                    evaluator.calculate_metrics(loss, target, pred)
+                if local_step % hp.synth_freq == 0:
+                    evaluator.evaluate(local_step)
                 # break
 
             print("global_step=", gs, "\tlocal_step", local_step, "\tlocal_progress",
